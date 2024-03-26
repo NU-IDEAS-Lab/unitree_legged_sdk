@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(unitree_legged_sdk)
 
 # check arch and os
@@ -22,17 +22,7 @@ set(EXTRA_LIBS -pthread libunitree_legged_sdk.a)
 set(CMAKE_CXX_FLAGS "-O3 -fPIC")
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(catkin QUIET)
-if(${catkin_FOUND})
-  catkin_package(
-    INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_SOURCE_DIR}/lib/cpp/${ARCH}/libunitree_legged_sdk.a
-  )
-endif()
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
-# one pc one process
+# Declare the C++ executables
 add_executable(example_position example/example_position.cpp)
 target_link_libraries(example_position ${EXTRA_LIBS})
 
@@ -48,11 +38,28 @@ target_link_libraries(example_walk ${EXTRA_LIBS})
 add_executable(example_joystick example/example_joystick.cpp)
 target_link_libraries(example_joystick ${EXTRA_LIBS})
 
-
-# install
+# Install targets
 install(TARGETS
   example_position example_velocity example_torque example_walk example_joystick
-  DESTINATION bin/unitree)
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY include/
+  DESTINATION include/
+)
+
 install(DIRECTORY lib/cpp/${ARCH}/
-  DESTINATION lib/unitree
-  USE_SOURCE_PERMISSIONS)
+  DESTINATION lib/${PROJECT_NAME}
+  USE_SOURCE_PERMISSIONS
+)
+
+# Include CMake utilities for ROS 2
+find_package(ament_cmake QUIET)
+if(${ament_cmake_FOUND})
+  # Export the include directories for this package
+  ament_export_include_directories(include)
+  ament_package()
+  message(STATUS "Packaged with ament_cmake.")
+else()
+  message(WARNING "Did not package with ament_cmake.")
+endif()
