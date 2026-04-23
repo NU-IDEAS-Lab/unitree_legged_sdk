@@ -22,11 +22,9 @@ set(CMAKE_CXX_FLAGS "-O3 -fPIC")
 set(CMAKE_CXX_STANDARD 14)
 
 set(unitree_legged_sdk_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/cpp/${ARCH}/libunitree_legged_sdk.a)
-set(unitree_legged_sdk_INSTALL_LOCATION ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/libunitree_legged_sdk.a)
 add_library(unitree_legged_sdk IMPORTED STATIC GLOBAL)
 set_target_properties(unitree_legged_sdk PROPERTIES
   IMPORTED_LOCATION ${unitree_legged_sdk_LOCATION}
-  IMPORTED_LOCATION_INSTALL ${unitree_legged_sdk_INSTALL_LOCATION}
 )
 
 # Declare the C++ executables
@@ -70,9 +68,8 @@ if(${ament_cmake_FOUND})
   # Export the include directories for this package
   ament_export_include_directories(include)
 
-  # Export the libraries for this package using the installed path,
-  # not the imported target's IMPORTED_LOCATION (which points to the source tree and is deleted after build).
-  ament_export_libraries("${unitree_legged_sdk_INSTALL_LOCATION}")
+  # Export the libraries for this package
+  ament_export_libraries(unitree_legged_sdk)
 
   ament_package()
   message(STATUS "Packaged with ament_cmake.")
